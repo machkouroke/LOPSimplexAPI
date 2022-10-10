@@ -1,8 +1,5 @@
 # Déclaration du tableau initial de contrainte
-A = Float64[1 2 3 1 0 0 90
-15 21 30 0 1 0 1260
-1 1 1 0 0 1 84
-87 147 258 0 0 0 0]
+
 
 function detect_solution(simplex_array, in_base)
     variables = Dict()
@@ -16,8 +13,8 @@ end
 function simplex(A, f, iter=2)
     B = deepcopy(A)
     incoming(x) = findmax(x[end, 1:end-1])[2]
-    outgoing(x, pivot) = findmin(x[1:end-1, end] ./ x[1:end - 1, pivot])[2]
-    cat(x, y) = [x;y]
+    outgoing(x, pivot) = findmin(x[1:end-1, end] ./ x[1:end-1, pivot])[2]
+    cat(x, y) = [x; y]
     n, p = size(A)[1] - 1, size(A)[2] - 1
     in_base = ["e_$(i)" for i in 1:n]
     out_base = ["x_$(i)" for i in 1:p-n]
@@ -35,6 +32,10 @@ function simplex(A, f, iter=2)
 end
 
 function main()
+    A = Float64[1 2 3 1 0 0 90
+        15 21 30 0 1 0 1260
+        1 1 1 0 0 1 84
+        87 147 258 0 0 0 0]
     f(x) = 87x[1] + 147x[2] + 258x[3]
     @show simplex(A, f)
 end
