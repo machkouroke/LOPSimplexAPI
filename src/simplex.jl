@@ -23,7 +23,7 @@ end
 """
     simplex(A::Matrix{Float64})
 """
-function simplex(A::Matrix{Float64})
+function simplex(A::Matrix{Float64}; verbose=false)
     B::Matrix{Float64} = deepcopy(A)
     n::Int64, p::Int64 = size(B)[1] - 1, size(B)[2] - 1
     in_base::Vector{String} = ["e_$(i)" for i in 1:n]
@@ -33,21 +33,21 @@ function simplex(A::Matrix{Float64})
         k = incoming(B)
         p = outgoing(B, k)
         in_base[p] = all_base[k]
-        @show in_base
+        verbose && @show in_base
+       
         not_outgoing = setdiff(1:size(B)[1], [p])
         B[p, :] = B[p, :] ./ B[p, k]
         B[not_outgoing, :] = B[not_outgoing, :] - B[not_outgoing, k] * B[p, :]'
-        display(B)
+        verbose && display(B)
     end
     return detect_solution(B, in_base)
 end
 
 function main()
-    A = Float64[1 2 3/2 1 0 0 12
-        2/3 2/3 1 0 1 0 4.6
-        1/2 1/3 1/2 0 0 1 2.4
-        -11 -16 -15 0 0 0 0]
+    A  = Float64[-1 1 1 0 0 11
+    1 1 0 1 0 27
+    2 5 0 0 1 90
+    -4 -6 0 0 0 0]
     @show simplex(A)
 end
 
-main()
