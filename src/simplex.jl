@@ -43,11 +43,4 @@ function simplex(A::Matrix{Float64}; verbose=false)
     return detect_solution(B, in_base)
 end
 
-function main()
-    A  = Float64[-1 1 1 0 0 11
-    1 1 0 1 0 27
-    2 5 0 0 1 90
-    -4 -6 0 0 0 0]
-    @show simplex(A)
-end
 
