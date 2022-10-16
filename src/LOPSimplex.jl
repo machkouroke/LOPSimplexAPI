@@ -1,5 +1,8 @@
 module LOPSimplex
 
-# Write your package code here.
+include("simplex.jl")
+
+export simplex
+
 
 end
