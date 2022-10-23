@@ -1,10 +1,19 @@
-function detect_solution(simplex_array, in_base)
+function detect_solution(simplex_array, solution_set; maximum=true)
     variables = Dict()
-    for (index, variable) in enumerate(in_base)
-        if split(variable, "_")[1] == "x"
-            variables[variable] = simplex_array[index, end]
+    if maximum
+        for (index, variable) in enumerate(solution_set)
+            if split(variable, "_")[1] == "x"
+                variables[variable] = simplex_array[index, end]
+            end
+        end
+    else
+        for (index, variable) in enumerate(solution_set)
+            if split(variable, "_")[1] == "e"
+                variables["x_$(split(variable, "_")[2])"] = simplex_array[end, index]
+            end
         end
     end
+
     return variables
 end
 
@@ -23,7 +32,7 @@ end
 """
     simplex(A::Matrix{Float64})
 """
-function simplex(A::Matrix{Float64}; verbose=false)
+function simplex(A::Matrix{Float64}; verbose=false, maximum=true)
     B::Matrix{Float64} = deepcopy(A)
     n::Int64, p::Int64 = size(B)[1] - 1, size(B)[2] - 1
     in_base::Vector{String} = ["e_$(i)" for i in 1:n]
@@ -34,13 +43,20 @@ function simplex(A::Matrix{Float64}; verbose=false)
         p = outgoing(B, k)
         in_base[p] = all_base[k]
         verbose && @show in_base
-       
+
         not_outgoing = setdiff(1:size(B)[1], [p])
         B[p, :] = B[p, :] ./ B[p, k]
         B[not_outgoing, :] = B[not_outgoing, :] - B[not_outgoing, k] * B[p, :]'
         verbose && display(B)
     end
-    return detect_solution(B, in_base)
+    return detect_solution(B, maximum ? in_base : all_base, maximum=maximum)
 end
 
+function main()
+    A = Float64[1 3 3 1 0 100
+        2 2 1 0 1 100
+        -60 -120 -90 0 0 0]
+    answer = simplex(A; verbose=true, maximum=false)
+end
 
+main()
