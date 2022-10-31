@@ -2,9 +2,7 @@ function detect_solution(simplex_array, solution_set; maximum=true)
     variables = Dict()
     if maximum
         for (index, variable) in enumerate(solution_set)
-            if split(variable, "_")[1] == "x"
-                variables[variable] = simplex_array[index, end]
-            end
+            variables[variable] = simplex_array[index, end]
         end
     else
         for (index, variable) in enumerate(solution_set)
@@ -32,31 +30,46 @@ end
 """
     simplex(A::Matrix{Float64})
 """
-function simplex(A::Matrix{Float64}; verbose=false, maximum=true)
+function simplex(A::Matrix{Float64} ;in_base=Nothing, all_base=Nothing, verbose=false, maximum=true)
+    n::Int64, m::Int64 = size(A)[1] - 1, size(A)[2] - 1
+    if in_base == Nothing
+        in_base = ["e_$(i)" for i in 1:n]
+    end
+    if all_base == Nothing
+        out_base::Vector{String} = ["x_$(i)" for i in 1:m-n]
+        all_base = vcat(out_base, in_base)
+    end
     B::Matrix{Float64} = deepcopy(A)
-    n::Int64, p::Int64 = size(B)[1] - 1, size(B)[2] - 1
-    in_base::Vector{String} = ["e_$(i)" for i in 1:n]
-    out_base::Vector{String} = ["x_$(i)" for i in 1:p-n]
-    all_base::Vector{String} = vcat(out_base, in_base)
+    
     while any(i -> i < 0, B[end, 1:end-1])
+        verbose && @show in_base
+        verbose && display(B)
         k = incoming(B)
         p = outgoing(B, k)
         in_base[p] = all_base[k]
-        verbose && @show in_base
-
+        
         not_outgoing = setdiff(1:size(B)[1], [p])
         B[p, :] = B[p, :] ./ B[p, k]
         B[not_outgoing, :] = B[not_outgoing, :] - B[not_outgoing, k] * B[p, :]'
-        verbose && display(B)
+        
     end
+    verbose && println("Final solution")
+    verbose && @show in_base
+    verbose && display(B)
     return detect_solution(B, maximum ? in_base : all_base, maximum=maximum)
 end
 
 function main()
-    A = Float64[1 3 3 1 0 100
-        2 2 1 0 1 100
-        -60 -120 -90 0 0 0]
-    answer = simplex(A; verbose=true, maximum=false)
+    A = Float64[0.0   1.25  1.0  0.0   0.25  3.5
+    0.0   2.25  0.0  1.0   0.25 4.5
+    1.0  -0.25  0.0  0.0  -0.25  0.5
+    -2   -3   0.0  0.0 0     0]
+    
+    # in_base::Vector{String} = ["e_$(i)" for i in 1:n]
+    # out_base::Vector{String} = ["x_$(i)" for i in 1:m-n]
+    # all_base::Vector{String} = vcat(out_base, in_base)
+    println("***Start***")
+    answer = simplex(A; in_base=["e_1", "e_2", "x_1"], all_base=["x_1", "x_2", "e_1", "e_2", "e_3"], verbose=true)
 end
 
 main()
