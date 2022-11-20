@@ -35,7 +35,7 @@ function in_base_finder(inequality)
         variable = @match inequality begin
             "<=" => "e_$index"
             ">=" => "a_$index"
-            "=" => "e_$index"
+            "=" => "a_$index"
         end
         push!(in_base, variable)
     end
@@ -45,14 +45,17 @@ end
 function simplex_matrix_builder(A::Matrix{Float64}, b::Vector{Float64}, c::Vector{Float64}; inequality=["<=" for i in 1:size(A)[1]])
     n::Int64, m::Int64 = size(A)[1], size(A)[2]
     variable_name = variable_name_builder(A)
-    in_base = in_base_finder(A, inequality=inequality)
+    in_base = in_base_finder(inequality)
     A = A |>
         x -> add_slack_variable(x; inequality=inequality) |>
-             x -> add_artificial_variable(x; inequality=inequality) |>
-                  x -> x[:, findall(x -> x != 0, sum(x, dims=1)[1, :])] # remove zero columns
+             x -> add_artificial_variable(x; inequality=inequality) 
+                  
 
-    c = vcat(c[1:end-1], zeros(n), c[end])
-    b = vcat(b, zeros(n))
-    simplex_array = vcat(hcat(A, b), c)
+    c = vcat(c[1:end-1], zeros(n * 2), c[end])
+    simplex_array = vcat(hcat(A, b), c')
+    not_null_columns = vec(mapslices(col -> any(col .!= 0), simplex_array, dims = 1))
+    
+    simplex_array = simplex_array[:, not_null_columns]
+    variable_name = variable_name[not_null_columns[1:end-1]]
     return simplex_array, variable_name, in_base
 end
