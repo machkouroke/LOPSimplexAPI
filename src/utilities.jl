@@ -11,3 +11,12 @@ function add_slack_variable(A::Matrix{Float64}; inequality=["<=" for i in 1:size
     end
     return hcat(A, slack_variable)
 end
+
+function add_artificial_variable(A::Matrix{Float64}; inequality=["<=" for i in 1:size(A)[1]])
+    n::Int64, m::Int64 = size(A)[1], size(A)[2]
+    slack_variable::Matrix{Float64} = zeros(n, n)
+    for (index, inequality) in enumerate(inequality)
+        slack_variable[index, index] = inequality in ["=", ">="]
+    end
+    return hcat(A, slack_variable)
+end
