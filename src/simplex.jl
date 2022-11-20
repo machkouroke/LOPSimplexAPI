@@ -11,7 +11,6 @@ function detect_solution(simplex_array, solution_set; maximum=true)
             end
         end
     end
-
     return variables
 end
 
@@ -57,6 +56,10 @@ function simplex(A::Matrix{Float64}; in_base=Nothing, all_base=Nothing, verbose=
     verbose && @show in_base
     verbose && display(B)
     return detect_solution(B, maximum ? in_base : all_base, maximum=maximum)
+end
+
+function simplex_case()
+    
 end
 
 function main()
