@@ -30,7 +30,7 @@ end
 """
     simplex(A::Matrix{Float64})
 """
-function simplex(A::Matrix{Float64} ;in_base=Nothing, all_base=Nothing, verbose=false, maximum=true)
+function simplex(A::Matrix{Float64}; in_base=Nothing, all_base=Nothing, verbose=false, maximum=true)
     n::Int64, m::Int64 = size(A)[1] - 1, size(A)[2] - 1
     if in_base == Nothing
         in_base = ["e_$(i)" for i in 1:n]
@@ -40,18 +40,18 @@ function simplex(A::Matrix{Float64} ;in_base=Nothing, all_base=Nothing, verbose=
         all_base = vcat(out_base, in_base)
     end
     B::Matrix{Float64} = deepcopy(A)
-    
+
     while any(i -> i < 0, B[end, 1:end-1])
         verbose && @show in_base
         verbose && display(B)
         k = incoming(B)
         p = outgoing(B, k)
         in_base[p] = all_base[k]
-        
+
         not_outgoing = setdiff(1:size(B)[1], [p])
         B[p, :] = B[p, :] ./ B[p, k]
         B[not_outgoing, :] = B[not_outgoing, :] - B[not_outgoing, k] * B[p, :]'
-        
+
     end
     verbose && println("Final solution")
     verbose && @show in_base
@@ -60,16 +60,16 @@ function simplex(A::Matrix{Float64} ;in_base=Nothing, all_base=Nothing, verbose=
 end
 
 function main()
-    A = Float64[0.0   1.25  1.0  0.0   0.25  3.5
-    0.0   2.25  0.0  1.0   0.25 4.5
-    1.0  -0.25  0.0  0.0  -0.25  0.5
-    -2   -3   0.0  0.0 0     0]
-    
+    A = Float64[1 1 1 1 0 0 340
+        2 3 1 0 1 0 2400
+        1 2 3 0 0 1 560
+        -1100 -1400 -1500 0 0 0 0]
+
     # in_base::Vector{String} = ["e_$(i)" for i in 1:n]
     # out_base::Vector{String} = ["x_$(i)" for i in 1:m-n]
     # all_base::Vector{String} = vcat(out_base, in_base)
     println("***Start***")
-    answer = simplex(A; in_base=["e_1", "e_2", "x_1"], all_base=["x_1", "x_2", "e_1", "e_2", "e_3"], verbose=true)
+    answer = simplex(A; verbose=true)
 end
 
 main()
