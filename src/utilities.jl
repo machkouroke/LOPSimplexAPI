@@ -48,14 +48,25 @@ function simplex_matrix_builder(A::Matrix{Float64}, b::Vector{Float64}, c::Vecto
     in_base = in_base_finder(inequality)
     A = A |>
         x -> add_slack_variable(x; inequality=inequality) |>
-             x -> add_artificial_variable(x; inequality=inequality) 
-                  
+             x -> add_artificial_variable(x; inequality=inequality)
+
 
     c = vcat(c[1:end-1], zeros(n * 2), c[end])
     simplex_array = vcat(hcat(A, b), c')
-    not_null_columns = vec(mapslices(col -> any(col .!= 0), simplex_array, dims = 1))
-    
+    not_null_columns = vec(mapslices(col -> any(col .!= 0), simplex_array, dims=1))
+
     simplex_array = simplex_array[:, not_null_columns]
     variable_name = variable_name[not_null_columns[1:end-1]]
     return simplex_array, variable_name, in_base
+end
+
+function function_by_artificial(A::Matrix{Float64}, in_base, all_variable)
+    A_copy = copy(A)
+    artificial_row = findall(x -> x[1:2] == "a_", in_base)
+    A_artificial_row = A[artificial_row, :]
+    A_copy[end, :] = sum(A_artificial_row, dims=1)
+    in_base_indice = findall(x -> x in in_base, all_variable)
+    A_copy[end, in_base_indice] .= 0
+    display(A_copy)
+    return A_copy
 end

@@ -215,3 +215,22 @@ end
         end
     end
 end
+
+@testset "function_by_artificial" begin
+
+    A = Float64[10 5 1 0 0 0 0 200
+        2 3 0 0 0 1 0 60
+        1 0 0 1 0 0 0 12
+        0 1 0 0 -1 0 1 6
+        2000 1000 0 0 0 0 0 0]
+
+    in_base = ["e_1", "a_2", "e_3", "a_4"]
+    variable_names = ["x_1", "x_2", "e_1", "e_3", "e_4", "a_2", "a_4"]
+    answer = function_by_artificial(A, in_base, variable_names)
+    true_answer = Float64[10 5 1 0 0 0 0 200
+        2 3 0 0 0 1 0 60
+        1 0 0 1 0 0 0 12
+        0 1 0 0 -1 0 1 6
+        2 4 0 0 -1 0 0 66]
+    @test answer == true_answer
+end
