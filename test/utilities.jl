@@ -222,7 +222,7 @@ end
         2 3 0 0 0 1 0 60
         1 0 0 1 0 0 0 12
         0 1 0 0 -1 0 1 6
-        2000 1000 0 0 0 0 0 0]
+        -2000 -1000 0 0 0 0 0 0]
 
     in_base = ["e_1", "a_2", "e_3", "a_4"]
     variable_names = ["x_1", "x_2", "e_1", "e_3", "e_4", "a_2", "a_4"]
@@ -231,6 +231,25 @@ end
         2 3 0 0 0 1 0 60
         1 0 0 1 0 0 0 12
         0 1 0 0 -1 0 1 6
-        2 4 0 0 -1 0 0 66]
+        -2 -4 0 0 1 0 0 -66]
     @test answer == true_answer
+end
+
+
+@testset "Remove remove_artificial_column" begin
+    A = Float64[6.66667 0.0 1.0 0.0 0.0 -1.66667 0.0 100.0
+        0.666667 0.0 0.0 0.0 1.0 0.333333 -1.0 14.0
+        1.0 0.0 0.0 1.0 0.0 0.0 0.0 12.0
+        0.666667 1.0 0.0 0.0 0.0 0.333333 0.0 20.0
+        0.0 0.0 0.0 0.0 0.0 1.0 1.0 0.0]
+    all_variable_names = ["x_1", "x_2", "e_1", "e_3", "e_4", "a_2", "a_4"]
+    true_answer = Float64[6.66667 0.0 1.0 0.0 0.0 100.0
+        0.666667 0.0 0.0 0.0 1.0 14.0
+        1.0 0.0 0.0 1.0 0.0 12.0
+        0.666667 1.0 0.0 0.0 0.0 20.0
+        0.0 0.0 0.0 0.0 0.0 0.0]
+    true_variable_names = ["x_1", "x_2", "e_1", "e_3", "e_4"]
+    answer = remove_artificial_column(A, all_variable_names)
+    @test answer[1] == true_answer
+    @test answer[2] == true_variable_names
 end

@@ -64,15 +64,28 @@ end
 
 """
     function_by_artificial(A::Matrix{Float64}, in_base, all_variable)
-Expression of the function of the first phasz by out base variable
+Remplace la fonction objectif d'un tableau du simplex par la fonction somme des variables artificielles. 
+Ces variable seront ensuite exprimé par les variables hors bases
+# Arguments
+- `A::Matrix{Float64}`: tableau du simplex de la première phase
+- `in_base::Vector{String}`: vecteur des variables dans la base
+- `all_variable::Vector{String}`: vecteur de toutes les variables
 """
 function function_by_artificial(A::Matrix{Float64}, in_base, all_variable)
     A_copy = copy(A)
     artificial_row = findall(x -> x[1:2] == "a_", in_base)
-    A_artificial_row = A[artificial_row, :]
-    A_copy[end, :] = sum(A_artificial_row, dims=1)
+    A_copy[end, :] = -sum(A[artificial_row, :], dims=1)
     in_base_indice = findall(x -> x in in_base, all_variable)
     A_copy[end, in_base_indice] .= 0
     display(A_copy)
     return A_copy
+end
+
+
+
+function remove_artificial_column(A::Matrix{Float64}, variable_name::Vector{String})
+    artificial_variable = findall(x -> x[1:2] == "a_", variable_name)
+    A = A[:, setdiff(1:size(A)[2], artificial_variable)]
+    variable_name = variable_name[setdiff(1:size(A)[2], artificial_variable)]
+    return A, variable_name
 end
