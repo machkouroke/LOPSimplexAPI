@@ -4,7 +4,7 @@
         1 1 0 1 0 27
         2 5 0 0 1 90
         -4 -6 0 0 0 0]
-    answer = simplex(A)
+    answer = simplex(A)[2]
     true_answer = Dict{Any,Any}("x_1" => 15, "x_2" => 12)
     for (key, value) in true_answer
         @test answer[key] ≈ value
@@ -26,7 +26,7 @@ end
         "B" => Dict{Any,Any}("x_1" => 3, "x_2" => 18)
     )
     for (name, array) in data
-        ans = simplex(array)
+        ans = simplex(array)[2]
         for (key, answer) in true_answer[name]
             @test ans[key] ≈ answer
         end

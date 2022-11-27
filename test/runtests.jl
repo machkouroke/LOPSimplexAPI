@@ -6,8 +6,7 @@ using LOPSimplex: simplex,
     variable_name_builder,
     simplex_matrix_builder,
     function_by_artificial,
-    remove_artificial_column,
-    replace_artificial_function_by_original
+    remove_artificial_column
 using Test
 
 include("simplex.jl")
