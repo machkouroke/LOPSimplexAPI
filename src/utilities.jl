@@ -52,6 +52,7 @@ function simplex_matrix_builder(A::Matrix{Float64}, b::Vector{Float64}, c::Vecto
 
 
     c = vcat(c[1:end-1], zeros(n * 2), c[end])
+
     simplex_array = vcat(hcat(A, b), c')
     not_null_columns = vec(mapslices(col -> any(col .!= 0), simplex_array, dims=1))
 
@@ -60,6 +61,11 @@ function simplex_matrix_builder(A::Matrix{Float64}, b::Vector{Float64}, c::Vecto
     return simplex_array, variable_name, in_base
 end
 
+
+"""
+    function_by_artificial(A::Matrix{Float64}, in_base, all_variable)
+Expression of the function of the first phasz by out base variable
+"""
 function function_by_artificial(A::Matrix{Float64}, in_base, all_variable)
     A_copy = copy(A)
     artificial_row = findall(x -> x[1:2] == "a_", in_base)
