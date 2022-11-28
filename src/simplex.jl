@@ -63,6 +63,7 @@ Effectue les opérations de pivot de l'algorithme du simplex sur la matrice A.
 - `primal::Bool`: Précise si l'on souhaite afficher la solution du problème primal.
 """
 function simplex(A::Matrix{Float64}; in_base=Nothing, all_base=Nothing, verbose::Bool=false, primal=true)
+    all_iteration, iter_rank = Dict(), 1
     n::Int64, m::Int64 = size(A)[1] - 1, size(A)[2] - 1
     if in_base == Nothing
         in_base = ["e_$(i)" for i in 1:n]
@@ -74,6 +75,7 @@ function simplex(A::Matrix{Float64}; in_base=Nothing, all_base=Nothing, verbose:
     B::Matrix{Float64} = deepcopy(A)
 
     while any(i -> i < 0, B[end, 1:end-1])
+        all_iteration[iter_rank] = Dict("in_base" => in_base, "Simplex array" => B)
         verbose && @show in_base
         verbose && display(B)
         k = incoming(B)
@@ -83,11 +85,12 @@ function simplex(A::Matrix{Float64}; in_base=Nothing, all_base=Nothing, verbose:
         not_outgoing = setdiff(1:size(B)[1], [p])
         B[p, :] = B[p, :] ./ B[p, k]
         B[not_outgoing, :] = B[not_outgoing, :] - B[not_outgoing, k] * B[p, :]'
+        iter_rank += 1
     end
     verbose && println("Final solution")
     verbose && @show in_base
     verbose && display(B)
-    return B, detect_solution(B, primal ? in_base : all_base, primal=primal), in_base
+    return B, detect_solution(B, primal ? in_base : all_base, primal=primal), in_base, all_base, all_iteration
 end
 
 
