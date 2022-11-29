@@ -2,6 +2,7 @@ from flask import Flask, request, abort, jsonify
 import yaml
 import numpy as np
 from julia import LOPSimplex, Main
+from numpy import array
 
 app = Flask(__name__)
 
@@ -38,12 +39,27 @@ def get_inequality(data):
     return inequality
 
 
+def validate_nb(n):
+    return str(n).isdigit()
+
+
+# def validate_cons(cons):
+#     return all(x for x in cons)
+
+
+def val_cons_nb(A: array, p):
+    return A.shape[0] == p
+
+
+def val_var_nb(A: array, n):
+    return A.shape[1] == n
+
+
 def validation_data(data):
     pass
 
 
 def get_type(type_user, inequality):
-
     if type_user == 'max':
         if all(x == '<=' for x in inequality):
             tp = 'max_base'
@@ -66,6 +82,7 @@ def get_solution():
         A, B, C, inequality = get_data()
         simplex = Main.eval('LOPSimplex.simplex_case')
         answer = simplex(A, B, C)
+
         return jsonify({
             'success': True,
             'ligne_nbr': len(answer[2]),
@@ -80,7 +97,9 @@ def get_solution():
 def get_data():
     data = request.form['data']
     data = yaml.safe_load(data)
-    return get_A(data), get_B(data), get_C(data), get_inequality(data), data['type']
+    A = get_A(data)
+    if val_cons_nb(A, data['p']) and val_var_nb(A, data['n']):
+        return A, get_B(data), get_C(data), get_inequality(data), data['type']
 
 
 @app.route('/')
