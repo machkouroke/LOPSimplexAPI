@@ -62,16 +62,25 @@ def get_type(type_user, inequality):
 
 
 def get_solution():
-    A, B, C, inequality = get_data()
-    simplex = Main.eval('LOPSimplex.simplex_case')
-    answer = simplex(A, B, C)
+    try:
+        A, B, C, inequality = get_data()
+        simplex = Main.eval('LOPSimplex.simplex_case')
+        answer = simplex(A, B, C)
+        return jsonify({
+            'success': True,
+            'ligne_nbr': len(answer[2]),
+            'colonne_nbr': len(answer[3]),
+            'data': answer[1]
+        })
+    except Exception as e:
+        abort(500, f'{type(e)}: {e}')
 
 
 @app.route('/test', methods=['POST'])
 def get_data():
     data = request.form['data']
     data = yaml.safe_load(data)
-    return get_A(data), get_B(data), get_C(data), get_inequality(data)
+    return get_A(data), get_B(data), get_C(data), get_inequality(data), data['type']
 
 
 @app.route('/')
