@@ -82,6 +82,20 @@ def get_solution():
         A, B, C, inequality = get_data()
         simplex = Main.eval('LOPSimplex.simplex_case')
         answer = simplex(A, B, C)
+        end = {'Simplex array': answer[0], 'in_base': answer[2]}
+        tables = {}
+        for k in sorted(answer[-1].keys()):
+            tables[k] = answer[-1][k]
+        tables['end'] = end
+
+        D = {}
+        for k in tables.keys():
+            liste = []
+            line = (tables[k]['in_base']) + ['Cj']
+            for i in range(len(line)):
+                liste.append([line[i]] + (tables[1]['Simplex array'].tolist())[i])
+            D[k] = liste
+        print(D)
 
         return jsonify({
             'success': True,
