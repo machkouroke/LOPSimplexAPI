@@ -75,7 +75,7 @@ function simplex(A::Matrix{Float64}; in_base=Nothing, all_base=Nothing, verbose:
     B::Matrix{Float64} = deepcopy(A)
 
     while any(i -> i < 0, B[end, 1:end-1])
-        all_iteration[iter_rank] = Dict("in_base" => in_base, "Simplex array" => B)
+        all_iteration[iter_rank] = Dict("in_base" => deepcopy(in_base), "Simplex array" => deepcopy(B))
         verbose && @show in_base
         verbose && display(B)
         k = incoming(B)
@@ -106,21 +106,21 @@ Permet de détecter quelle algorithme du simplex appliquer en fonction du systè
 - `type::String`: Type de problème à résoudre soit une maximisation ou une minimisation
 """
 function simplex_case(A::Matrix{Float64}, b::Vector{Float64}, c::Vector{Float64};
-    inequality=["<=" for i in 1:size(A)[1]], type="max_base")
+    inequality=["<=" for i in 1:size(A)[1]], type="max_base", verbose=false)
     @match type begin
         "max_base" => begin
             simp_array, all_variable, in_base_variable = simplex_matrix_builder(A, b, -c)
-            answer = simplex(simp_array; in_base=in_base_variable, all_base=all_variable, verbose=true)
+            answer = simplex(simp_array; in_base=in_base_variable, all_base=all_variable, verbose=verbose)
         end
         "min_base" => begin
             simp_array, all_variable, in_base_variable = simplex_matrix_builder(convert(Matrix{Float64}, A'), c[1:end-1], [-b; 0])
-            answer = simplex(simp_array; in_base=in_base_variable, all_base=all_variable, verbose=true, primal=false)
+            answer = simplex(simp_array; in_base=in_base_variable, all_base=all_variable, verbose=verbose, primal=false)
         end
         "max_mixed" => begin
             # First Phase
             first_simp_array, first_all_variable, first_in_base_variable = simplex_matrix_builder(A, b, -c; inequality=inequality)
             first_simp_array_with_artificial_function = function_by_artificial(first_simp_array, first_in_base_variable, first_all_variable)
-            first_simp_array, first_answer, first_in_base_variable = simplex(first_simp_array_with_artificial_function; in_base=first_in_base_variable, all_base=first_all_variable, verbose=true)
+            first_simp_array, first_answer, first_in_base_variable = simplex(first_simp_array_with_artificial_function; in_base=first_in_base_variable, all_base=first_all_variable, verbose=verbose)
             # if first_answer[end, end] != 0
             #     println("Le problème n'a pas de solution")
             #     return
@@ -129,10 +129,8 @@ function simplex_case(A::Matrix{Float64}, b::Vector{Float64}, c::Vector{Float64}
             second_simp_array, second_all_variable = remove_artificial_column(first_simp_array, first_all_variable)
             c_evaluated = c |>
                           x -> vcat(-x[1:end-1], zeros(size(second_simp_array)[1] - 2), x[end])
-            display(second_simp_array)
-            display(c_evaluated)
             second_simp_array[end, :] = c_evaluated
-            second_simp_array, second_answer, second_in_base_variable = simplex(second_simp_array; in_base=first_in_base_variable, all_base=second_all_variable, verbose=true)
+            second_simp_array, second_answer, second_in_base_variable = simplex(second_simp_array; in_base=first_in_base_variable, all_base=second_all_variable, verbose=verbose)
         end
     end
 end
@@ -147,7 +145,8 @@ function main()
     inequality = ["<=", "=", "<=", ">="]
     println("***Start***")
     answer = simplex_case(A, b, c; type="max_mixed", inequality=inequality)
-    print(answer[2])
+    foreach(x -> display(x["Simplex array"]), values(answer[5]))
+    return 0
 end
 
 main()

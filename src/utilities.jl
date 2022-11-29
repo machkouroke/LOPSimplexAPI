@@ -77,7 +77,6 @@ function function_by_artificial(A::Matrix{Float64}, in_base, all_variable)
     A_copy[end, :] = -sum(A[artificial_row, :], dims=1)
     in_base_indice = findall(x -> x in in_base, all_variable)
     A_copy[end, in_base_indice] .= 0
-    display(A_copy)
     return A_copy
 end
 
