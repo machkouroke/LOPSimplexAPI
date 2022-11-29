@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, abort, jsonify
 import yaml
 import numpy as np
 from julia import LOPSimplex, Main
@@ -40,6 +40,25 @@ def get_inequality(data):
 
 def validation_data(data):
     pass
+
+
+def get_type(type_user, inequality):
+
+    if type_user == 'max':
+        if all(x == '<=' for x in inequality):
+            tp = 'max_base'
+        elif all(x == '>=' for x in inequality):
+            tp = 'min_max'
+        else:
+            tp = 'max_mixed'
+    else:
+        if all(x == '>=' for x in inequality):
+            tp = 'min_base'
+        elif all(x == '<=' for x in inequality):
+            tp = 'min_max'
+        else:
+            tp = 'min_mixed'
+    return tp
 
 
 def get_solution():
