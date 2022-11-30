@@ -3,3 +3,4 @@ venv
 .github
 .vscode
 .gitignore
+__pycache__

@@ -2,3 +2,4 @@ venv
 .idea
 julia/Manifest.toml
 .vscode 
+__pycache__
