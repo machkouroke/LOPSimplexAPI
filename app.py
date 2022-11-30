@@ -121,5 +121,9 @@ def hello_world():  # put application's code here
     return 'hello.py'
 
 
+def create_app():
+    return app
+
+
 if __name__ == '__main__':
     app.run()
