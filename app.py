@@ -3,7 +3,7 @@ import yaml
 import numpy as np
 from julia import LOPSimplex, Main
 from numpy import array
-
+from error import setup_error_template
 app = Flask(__name__)
 
 
@@ -77,9 +77,20 @@ def get_type(type_user, inequality):
     return tp
 
 
+def get_data(request):
+    print(request.get_json())
+    data = request.get_json()['script']
+    data = yaml.safe_load(data)
+    A = get_A(data)
+    if val_cons_nb(A, data['p']) and val_var_nb(A, data['n']):
+        return A, get_B(data), get_C(data), get_inequality(data), data['type']
+
+
+@app.route('/test', methods=['POST'])
 def get_solution():
     try:
-        A, B, C, inequality = get_data()
+        print(request.get_json())
+        A, B, C, inequality, tp = get_data(request)
         simplex = Main.eval('LOPSimplex.simplex_case')
         answer = simplex(A, B, C)
         end = {'Simplex array': answer[0], 'in_base': answer[2]}
@@ -95,25 +106,15 @@ def get_solution():
             for i in range(len(line)):
                 liste.append([line[i]] + (tables[1]['Simplex array'].tolist())[i])
             D[k] = liste
-        print(D)
 
         return jsonify({
             'success': True,
-            'ligne_nbr': len(answer[2]),
-            'colonne_nbr': len(answer[3]),
-            'data': answer[1]
+            'allVariables': answer[3],
+            'data': D,
+            'answer': answer[1]
         })
     except Exception as e:
         abort(500, f'{type(e)}: {e}')
-
-
-@app.route('/test', methods=['POST'])
-def get_data():
-    data = request.get_json()['data']
-    data = yaml.safe_load(data)
-    A = get_A(data)
-    if val_cons_nb(A, data['p']) and val_var_nb(A, data['n']):
-        return A, get_B(data), get_C(data), get_inequality(data), data['type']
 
 
 @app.route('/')
@@ -126,4 +127,5 @@ def create_app():
 
 
 if __name__ == '__main__':
-    app.run()
+    setup_error_template(app)
+    app.run(debug=True)
