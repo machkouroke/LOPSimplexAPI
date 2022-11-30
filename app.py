@@ -109,7 +109,7 @@ def get_solution():
 
 @app.route('/test', methods=['POST'])
 def get_data():
-    data = request.form['data']
+    data = request.get_json()['data']
     data = yaml.safe_load(data)
     A = get_A(data)
     if val_cons_nb(A, data['p']) and val_var_nb(A, data['n']):

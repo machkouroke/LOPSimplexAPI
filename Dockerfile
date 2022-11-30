@@ -5,7 +5,9 @@ COPY . /app
 
 WORKDIR /app
 
-RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl && pip install -r requirements.txt && python script/setup/setup.py && rm -rf /app/script
+RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl  \
+    && pip install -r requirements.txt  \
+    && python script/setup/setup.py && rm -rf ./script
 
-EXPOSE 8000
-CMD gunicorn wsgi:app
+EXPOSE 5000
+CMD gunicorn -b "0.0.0.0:5000" wsgi:app
