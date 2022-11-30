@@ -117,10 +117,13 @@ def get_solution():
         abort(500, f'{type(e)}: {e}')
 
 
-
 @app.route('/')
 def hello_world():  # put application's code here
     return 'hello.py'
+
+
+def create_app():
+    return app
 
 
 if __name__ == '__main__':
