@@ -24,6 +24,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
+          export DOCKER_BUILDKIT=1
           heroku container:push -a ${{ secrets.HEROKU_APP_NAME }} web
       - name: Release Docker image on Heroku
         env:
