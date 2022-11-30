@@ -1,13 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 venv
 .idea
-=======
-/Manifest.toml
-/julia/docs/build
-/julia/src/ShelfSql/test.sqlite
->>>>>>> julia-code/main
-=======
-/Manifest.toml
+julia/Manifest.toml
 .vscode 
->>>>>>> julia/main

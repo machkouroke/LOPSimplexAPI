@@ -8,10 +8,7 @@ jobs:
   TagBot:
     if: github.event_name == 'workflow_dispatch' || github.actor == 'JuliaTagBot'
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     working-directory: ./julia
-=======
->>>>>>> julia/main
     steps:
       - uses: JuliaRegistries/TagBot@v1
         with:

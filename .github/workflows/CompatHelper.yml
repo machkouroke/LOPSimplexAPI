@@ -6,10 +6,8 @@ on:
 jobs:
   CompatHelper:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
+
     working-directory: ./julia
-=======
->>>>>>> julia/main
     steps:
       - name: Pkg.add("CompatHelper")
         run: julia -e 'using Pkg; Pkg.add("CompatHelper")'
