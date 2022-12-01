@@ -1,3 +1,5 @@
+import itertools
+
 from flask import Flask, request, abort, jsonify
 import yaml
 import numpy as np
@@ -44,10 +46,6 @@ def validate_nb(n):
     return str(n).isdigit()
 
 
-# def validate_cons(cons):
-#     return all(x for x in cons)
-
-
 def val_cons_nb(A: array, p):
     return A.shape[0] == p
 
@@ -57,6 +55,10 @@ def val_var_nb(A: array, n):
 
 
 def validation_data(data):
+    pass
+
+
+def sparse():
     pass
 
 
@@ -80,7 +82,7 @@ def get_type(type_user, inequality):
 @app.route('/data', methods=['POST'])
 def get_data(req):
     # data = request.form['script']
-    data = yaml.safe_load(req.form['script'])
+    data = yaml.safe_load(req.get_json()['script'])
 
     A = get_A(data)
 
@@ -93,7 +95,7 @@ def voir():
     if request.method == 'POST':
         return jsonify({
             "success": True,
-            "data": request.form['script']
+            "data": request.get_json()['script']
         })
     else:
         return "ok"
@@ -102,21 +104,21 @@ def voir():
 @app.route('/test', methods=['POST'])
 def get_solution():
     try:
-        print(request.get_json())
         A, B, C, inequality, tp = get_data(request)
+
         simplex = Main.eval('LOPSimplex.simplex_case')
         answer = simplex(A, B, C)
         end = {'Simplex array': answer[0], 'in_base': answer[2]}
         tables = {k: answer[-1][k] for k in sorted(answer[-1].keys())}
         tables['end'] = end
 
-        D = {}
-        for k in tables:
+        D = []
+        for k in tables.keys():
             line = (tables[k]['in_base']) + ['Cj']
-            liste = [[line[i]] + (tables[1]['Simplex array'].tolist())[i] for i in range(len(line))]
+            liste = [[line[i]] + (tables[k]['Simplex array'].tolist())[i] for i in range(len(line))]
 
-            D[k] = liste
-
+            D.append(liste)
+        # print(D)
         return jsonify({
             'success': True,
             'allVariables': answer[3],
@@ -125,7 +127,6 @@ def get_solution():
         })
     except Exception as e:
         abort(500, f'{type(e)}: {e}')
-
 
 
 @app.route('/')

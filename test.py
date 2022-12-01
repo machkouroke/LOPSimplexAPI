@@ -57,7 +57,7 @@ def get_type(type_user, inequality):
 
 
 def get_data():
-    with open("test.yaml", "r") as stream:
+    with open("test/test.yaml", "r") as stream:
         data = yaml.safe_load(stream)
     return get_A(data), get_B(data), get_C(data), get_inequality(data), data['type']
 
@@ -79,15 +79,16 @@ if __name__ == '__main__':
     # print(tables[1])
     # print(table)
 
-    D = []
+    D = {}
     for k in tables.keys():
         liste = []
         line = (tables[k]['in_base']) + ['Cj']
         for i in range(len(line)):
-            liste.append([line[i]] + (tables[1]['Simplex array'].tolist())[i])
-        D.append(liste)
+            liste.append([line[i]] + (tables[k]['Simplex array'].tolist())[i])
+        D[k] = liste
     print(D)
 
+    print("Answer-1", answer[-1])
     print("Answer1", answer[1])
     print("Answer2", answer[2])
     print("Answer3", answer[3])
