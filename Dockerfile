@@ -1,57 +1,23 @@
-FROM ubuntu:latest
+# Set base image (host OS)
+FROM python:3.10
 
-LABEL MAINTAINER=machkouroke
-ARG PYTHON_VERSION=3.10.1
-ARG JULIA_VERSION=1.7.1
+# By default, listen on port 5000
+EXPOSE 5000/tcp
 
-ENV container docker
-ENV DEBIAN_FRONTEND noninteractive
-ENV LANG en_US.utf8
-ENV MAKEFLAGS -j4
-
-RUN mkdir /app
+# Set the working directory in the container
 WORKDIR /app
 
-# DEPENDENCIES
-#===========================================
-RUN apt-get update -y && \
-    apt-get install -y gcc make wget zlib1g-dev libffi-dev libssl-dev
+# Copy the dependencies file to the working directory
+COPY requirements.txt .
 
-# INSTALL PYTHON
-#===========================================
-RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz && \
-    tar -zxf Python-$PYTHON_VERSION.tgz && \
-    cd Python-$PYTHON_VERSION && \
-    ./configure --with-ensurepip=install --enable-shared && make && make install && \
-    ldconfig && \
-    ln -sf python3 /usr/local/bin/python
-RUN python -m pip install --upgrade pip setuptools wheel && \
-    python -m pip install julia
+# Install any dependencies
+RUN pip install -r requirements.txt
 
-# INSTALL JULIA
-#====================================
-RUN wget https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh && \
-    bash /app/jill.sh -y -v $JULIA_VERSION && \
-    export PYTHON="/usr/local/bin/python" && \
-    julia -e 'using Pkg; Pkg.add("PyCall")' && \
-    python -c 'import julia; julia.install()'
+# Copy the content of the local src directory to the working directory
+COPY . .
 
-# CLEAN UP
-#===========================================
-RUN rm -rf /app/jill.sh \
-    /opt/julias/*.tar.gz \
-    /app/Python-3.9.9.tgz
-
-RUN apt-get purge -y gcc make wget zlib1g-dev libffi-dev libssl-dev && \
-    apt-get autoremove -y
-
-
-COPY . /app
-
-WORKDIR /app
-
-RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl  \
-    && pip install -r requirements.txt
 
 EXPOSE 5000
+# Specify the command to run on container start
+RUN python3 ./computer/init.py
 CMD gunicorn wsgi:app
