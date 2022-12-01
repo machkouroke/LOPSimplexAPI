@@ -1,5 +1,5 @@
 venv
 .idea
-julia/Manifest.toml
+computer/Manifest.toml
 .vscode 
 __pycache__

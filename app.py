@@ -2,7 +2,7 @@ import itertools
 from flask import Flask, request, abort, jsonify
 import yaml
 import numpy as np
-from julia import LOPSimplex, Main
+from computer.Simplex import simplex_case
 from numpy import array
 from error import setup_error_template
 
@@ -92,7 +92,7 @@ def get_solution():
     try:
         print(request.get_json())
         A, B, C, inequality, tp = get_data(request)
-        simplex = Main.eval('LOPSimplex.simplex_case')
+        simplex = simplex_case
         answer = simplex(A, B, C)
         end = {'Simplex array': answer[0], 'in_base': answer[2]}
         tables = {k: answer[-1][k] for k in sorted(answer[-1].keys())}

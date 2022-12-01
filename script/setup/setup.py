@@ -1,4 +1,4 @@
-import julia
-print('Julia version:', julia.__version__)
+import computer
+print('Julia version:', computer.__version__)
 print('Installation ')
-julia.install()
+computer.install()
