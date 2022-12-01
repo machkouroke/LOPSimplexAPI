@@ -1,0 +1,10 @@
+mode: sparse
+type: max
+n: 3
+p: 3
+function: 7->{3};5->{1}
+constraints: |
+  1 2 3=90
+  15 21 30=1260
+  1 1 1=84
+inequality: <=;=->{2,1}
