@@ -6,7 +6,7 @@ import numpy as np
 from computer.Simplex import simplex_case
 from numpy import array
 from error import setup_error_template
-
+import os
 app = Flask(__name__)
 
 
@@ -135,4 +135,5 @@ def create_app():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)

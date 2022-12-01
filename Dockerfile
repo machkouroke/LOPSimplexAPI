@@ -20,4 +20,6 @@ COPY . .
 EXPOSE 5000
 # Specify the command to run on container start
 RUN python3 ./computer/init.py
-CMD gunicorn wsgi:app
+ENTRYPOINT [ "python" ]
+
+CMD ["app.py" ]
