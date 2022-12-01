@@ -1,8 +1,7 @@
 # Set base image (host OS)
 FROM python:3.10
 
-# By default, listen on port 5000
-EXPOSE 8080/tcp
+ENV CGO_ENABLED=0
 
 # Set the working directory in the container
 WORKDIR /app
@@ -21,4 +20,5 @@ EXPOSE 8080
 # Specify the command to run on container start
 RUN python3 ./computer/init.py
 
-CMD ["gunicorn"  , "-b", "0.0.0.0:8888", "wsgi:app"]
+EXPOSE $PORT
+CMD ["gunicorn"  , "-b", "0.0.0.0:$PORT", "wsgi:app"]
