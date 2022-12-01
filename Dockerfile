@@ -51,8 +51,7 @@ COPY . /app
 WORKDIR /app
 
 RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl  \
-    && pip install -r requirements.txt  \
-   rm -rf ./script
+    && pip install -r requirements.txt
 
 EXPOSE 5000
 CMD gunicorn wsgi:app
