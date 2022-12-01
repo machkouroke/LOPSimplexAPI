@@ -1,0 +1,9 @@
+type: max
+n: 3
+p: 3
+function: 87 147 258
+constraints: |
+  1 2 3 90
+  15 21 30 1260
+  1 1 1 84
+inequality: <=,=->{2}

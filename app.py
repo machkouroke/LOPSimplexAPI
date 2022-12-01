@@ -30,13 +30,13 @@ def get_C(data):
 
 
 def get_inequality(data):
-    inequality = ['<=' for i in range(data['p'])]
+    inequality = ['<=' for _ in range(data['p'])]
     others = ['=', '>=']
-    for t in [l.split('->') for l in data['inequality'].replace('{', '').replace('}', '').split(',')]:
-        for a in others:
-            if a in t:
-                for pos in t[-1].split():
-                    inequality[int(pos) - 1] = a
+    for t, a in itertools.product(
+            [l.split('->') for l in data['inequality'].replace('{', '').replace('}', '').split(',')], others):
+        if a in t:
+            for pos in t[-1].split():
+                inequality[int(pos) - 1] = a
     return inequality
 
 
@@ -68,13 +68,12 @@ def get_type(type_user, inequality):
             tp = 'min_max'
         else:
             tp = 'max_mixed'
+    elif all(x == '>=' for x in inequality):
+        tp = 'min_base'
+    elif all(x == '<=' for x in inequality):
+        tp = 'min_max'
     else:
-        if all(x == '>=' for x in inequality):
-            tp = 'min_base'
-        elif all(x == '<=' for x in inequality):
-            tp = 'min_max'
-        else:
-            tp = 'min_mixed'
+        tp = 'min_mixed'
     return tp
 
 
@@ -103,32 +102,27 @@ def voir():
 @app.route('/test', methods=['POST'])
 def get_solution():
     try:
-        # return request.form['script']
-        # # print(request.get_json())
+        print(request.get_json())
         A, B, C, inequality, tp = get_data(request)
         simplex = Main.eval('LOPSimplex.simplex_case')
         answer = simplex(A, B, C)
         end = {'Simplex array': answer[0], 'in_base': answer[2]}
-        tables = {}
-        return end
-        # for k in sorted(answer[-1].keys()):
-        #     tables[k] = answer[-1][k]
-        # tables['end'] = end
-        #
-        # D = {}
-        # for k in tables.keys():
-        #     liste = []
-        #     line = (tables[k]['in_base']) + ['Cj']
-        #     for i in range(len(line)):
-        #         liste.append([line[i]] + (tables[1]['Simplex array'].tolist())[i])
-        #     D[k]= liste
-        #
-        # return jsonify({
-        #     'success': True,
-        #     'allVariables': answer[3],
-        #     'data': D,
-        #     'answer': answer[1]
-        # })
+        tables = {k: answer[-1][k] for k in sorted(answer[-1].keys())}
+        tables['end'] = end
+
+        D = {}
+        for k in tables:
+            line = (tables[k]['in_base']) + ['Cj']
+            liste = [[line[i]] + (tables[1]['Simplex array'].tolist())[i] for i in range(len(line))]
+
+            D[k] = liste
+
+        return jsonify({
+            'success': True,
+            'allVariables': answer[3],
+            'data': D,
+            'answer': answer[1]
+        })
     except Exception as e:
         abort(500, f'{type(e)}: {e}')
 
@@ -139,6 +133,10 @@ def hello_world():  # put application's code here
     return 'hello.py'
 
 
-if __name__ == '__main__':
+def create_app():
     setup_error_template(app)
+    return app
+
+
+if __name__ == '__main__':
     app.run(debug=True)
