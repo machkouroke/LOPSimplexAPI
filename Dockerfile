@@ -10,4 +10,4 @@ RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl  \
     && python script/setup/setup.py && rm -rf ./script
 
 EXPOSE 5000
-CMD gunicorn -b "0.0.0.0" wsgi:app
+CMD gunicorn wsgi:app
