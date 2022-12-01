@@ -32,7 +32,7 @@ RUN python -m pip install --upgrade pip setuptools wheel && \
 #====================================
 RUN wget https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh && \
     bash /app/jill.sh -y -v $JULIA_VERSION && \
-    export PYTHON="python" && \
+    export PYTHON="/usr/local/bin/python" && \
     julia -e 'using Pkg; Pkg.add("PyCall")' && \
     python -c 'import julia; julia.install()'
 
@@ -54,5 +54,4 @@ RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl  \
     && pip install -r requirements.txt
 
 EXPOSE 5000
-RUN python3 script/setup/setup.py
 CMD gunicorn wsgi:app
