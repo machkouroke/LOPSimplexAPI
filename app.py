@@ -4,6 +4,7 @@ import numpy as np
 from julia import LOPSimplex, Main
 from numpy import array
 from error import setup_error_template
+
 app = Flask(__name__)
 
 
@@ -77,42 +78,57 @@ def get_type(type_user, inequality):
     return tp
 
 
-def get_data(request):
-    print(request.get_json())
-    data = request.get_json()['script']
-    data = yaml.safe_load(data)
+@app.route('/data', methods=['POST'])
+def get_data(req):
+    # data = request.form['script']
+    data = yaml.safe_load(req.form['script'])
+
     A = get_A(data)
+
     if val_cons_nb(A, data['p']) and val_var_nb(A, data['n']):
         return A, get_B(data), get_C(data), get_inequality(data), data['type']
+
+
+@app.route('/voir', methods=['GET', 'POST'])
+def voir():
+    if request.method == 'POST':
+        return jsonify({
+            "success": True,
+            "data": request.form['script']
+        })
+    else:
+        return "ok"
 
 
 @app.route('/test', methods=['POST'])
 def get_solution():
     try:
-        print(request.get_json())
+        # return request.form['script']
+        # # print(request.get_json())
         A, B, C, inequality, tp = get_data(request)
         simplex = Main.eval('LOPSimplex.simplex_case')
         answer = simplex(A, B, C)
         end = {'Simplex array': answer[0], 'in_base': answer[2]}
         tables = {}
-        for k in sorted(answer[-1].keys()):
-            tables[k] = answer[-1][k]
-        tables['end'] = end
-
-        D = {}
-        for k in tables.keys():
-            liste = []
-            line = (tables[k]['in_base']) + ['Cj']
-            for i in range(len(line)):
-                liste.append([line[i]] + (tables[1]['Simplex array'].tolist())[i])
-            D[k] = liste
-
-        return jsonify({
-            'success': True,
-            'allVariables': answer[3],
-            'data': D,
-            'answer': answer[1]
-        })
+        return end
+        # for k in sorted(answer[-1].keys()):
+        #     tables[k] = answer[-1][k]
+        # tables['end'] = end
+        #
+        # D = {}
+        # for k in tables.keys():
+        #     liste = []
+        #     line = (tables[k]['in_base']) + ['Cj']
+        #     for i in range(len(line)):
+        #         liste.append([line[i]] + (tables[1]['Simplex array'].tolist())[i])
+        #     D[k]= liste
+        #
+        # return jsonify({
+        #     'success': True,
+        #     'allVariables': answer[3],
+        #     'data': D,
+        #     'answer': answer[1]
+        # })
     except Exception as e:
         abort(500, f'{type(e)}: {e}')
 
