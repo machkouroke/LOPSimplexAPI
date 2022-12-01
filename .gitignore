@@ -3,3 +3,4 @@ venv
 computer/Manifest.toml
 .vscode 
 __pycache__
+.gitpod.yml

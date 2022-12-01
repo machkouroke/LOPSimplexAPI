@@ -1,2 +1,2 @@
-import julia
-jl = julia.Julia(compiled_modules=False)
+from juliacall import Main as jl
+jl.seval("using LOPSimplex")

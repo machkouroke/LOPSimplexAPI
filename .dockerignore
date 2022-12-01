@@ -4,3 +4,4 @@ venv
 .vscode
 .gitignore
 __pycache__
+.gitpod.yml
