@@ -1,9 +1,0 @@
-{
-    "packages": {
-        "LOPSimplex": {
-            "uuid": "c8c3e34f-4835-45dd-878b-201efac5a6be",
-            "version": "0.1.0",
-            "url": "https://github.com/machkouroke/LOPSimplex.jl.git"
-        }
-    }
-}

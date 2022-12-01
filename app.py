@@ -1,5 +1,6 @@
 import itertools
 from flask import Flask, request, abort, jsonify
+from flask_cors import CORS
 import yaml
 import numpy as np
 from computer.Simplex import simplex_case
@@ -122,6 +123,14 @@ def hello_world():  # put application's code here
 
 def create_app():
     setup_error_template(app)
+    
+    CORS(app, resources={r"/*": {"origins": "*"}})
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
+        return response
     return app
 
 

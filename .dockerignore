@@ -5,3 +5,4 @@ venv
 .gitignore
 __pycache__
 .gitpod.yml
+computer/__pycache__
