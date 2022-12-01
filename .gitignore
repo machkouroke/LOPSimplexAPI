@@ -1,5 +1,7 @@
 venv
 .idea
-julia/Manifest.toml
+computer/Manifest.toml
 .vscode 
 __pycache__
+.gitpod.yml
+computer/__pycache__

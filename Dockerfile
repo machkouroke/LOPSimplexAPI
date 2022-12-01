@@ -1,13 +1,25 @@
-FROM abelsiqueira/python-and-julia:py3.10-jl1.7
+# Set base image (host OS)
+FROM python:3.10
 
+# By default, listen on port 5000
+EXPOSE 5000/tcp
 
-COPY . /app
-
+# Set the working directory in the container
 WORKDIR /app
 
-RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl  \
-    && pip install -r requirements.txt  \
-    && python script/setup/setup.py && rm -rf ./script
+# Copy the dependencies file to the working directory
+COPY requirements.txt .
+
+# Install any dependencies
+RUN pip install -r requirements.txt
+
+# Copy the content of the local src directory to the working directory
+COPY . .
+
 
 EXPOSE 5000
-CMD gunicorn wsgi:app
+# Specify the command to run on container start
+RUN python3 ./computer/init.py
+ENTRYPOINT [ "python" ]
+
+CMD ["app.py" ]

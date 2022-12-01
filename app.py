@@ -90,23 +90,11 @@ def get_data(req):
         return A, get_B(data), get_C(data), get_inequality(data), data['type']
 
 
-@app.route('/voir', methods=['GET', 'POST'])
-def voir():
-    if request.method == 'POST':
-        return jsonify({
-            "success": True,
-            "data": request.get_json()['script']
-        })
-    else:
-        return "ok"
-
-
 @app.route('/test', methods=['POST'])
 def get_solution():
     try:
         A, B, C, inequality, tp = get_data(request)
-
-        simplex = Main.eval('LOPSimplex.simplex_case')
+        simplex = simplex_case
         answer = simplex(A, B, C)
         end = {'Simplex array': answer[0], 'in_base': answer[2]}
         tables = {k: answer[-1][k] for k in sorted(answer[-1].keys())}
@@ -136,8 +124,17 @@ def hello_world():  # put application's code here
 
 def create_app():
     setup_error_template(app)
+
+    CORS(app, resources={r"/*": {"origins": "*"}})
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
+        return response
     return app
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
