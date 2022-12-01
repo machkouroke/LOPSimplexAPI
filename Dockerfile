@@ -54,4 +54,4 @@ RUN --mount=type=cache,target=/var/julia julia script/setup/setup.jl  \
     && pip install -r requirements.txt
 
 EXPOSE 5000
-CMD gunicorn wsgi:app
+CMD script/setup/setup.py && gunicorn wsgi:app
