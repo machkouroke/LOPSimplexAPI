@@ -16,7 +16,7 @@ metadata:
     run.googleapis.com/client-name: cloud-console
     serving.knative.dev/creator: machkouroke@gmail.com
     serving.knative.dev/lastModifier: machkouroke@gmail.com
-    client.knative.dev/user-image: gcr.io/lopsimplex/simplex@sha256:564a59bffc671eb4c8c1039c0056717bf6356729f0a3497b1f30d6df2bbfcaf5
+    client.knative.dev/user-image: gcr.io/lopsimplex/simplex:latest
     run.googleapis.com/ingress: all
     run.googleapis.com/ingress-status: all
 spec:
