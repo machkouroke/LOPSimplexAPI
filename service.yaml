@@ -22,7 +22,6 @@ metadata:
 spec:
   template:
     metadata:
-      name: simplex-00008-wit
       annotations:
         run.googleapis.com/client-name: cloud-console
         autoscaling.knative.dev/minScale: '2'
@@ -58,12 +57,6 @@ status:
   - type: RoutesReady
     status: 'True'
     lastTransitionTime: '2022-12-02T01:20:10.943343Z'
-  latestReadyRevisionName: simplex-00008-wit
-  latestCreatedRevisionName: simplex-00008-wit
-  traffic:
-  - revisionName: simplex-00008-wit
-    percent: 100
-    latestRevision: true
   url: https://simplex-qzx7yzjfkq-ew.a.run.app
   address:
     url: https://simplex-qzx7yzjfkq-ew.a.run.app
