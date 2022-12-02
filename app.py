@@ -9,7 +9,6 @@ from error import setup_error_template
 import os
 
 
-
 def create_app():
     app = Flask(__name__)
 
@@ -82,26 +81,27 @@ def create_app():
     @app.route('/test', methods=['POST'])
     def get_solution():
         try:
-            print(request.get_json())
             A, B, C, inequality, tp = get_data(request)
-            answer = simplex_case_py(A, B, C,inequality)
-            end = {'Simplex array': answer[0], 'in_base': answer[2]}
-            tables = {k: answer[-1][k] for k in sorted(answer[-1].keys())}
+
+            answer = simplex_case_py(A, B, C, inequality)
+
+            end = {'Simplex array': np.array(answer[0]), 'in_base': list(answer[2])}
+
+            tables = {k: dict(answer[-1][k]) for k in sorted(dict(answer[-1]).keys())}
             tables['end'] = end
-
-            D = {}
+            D = []
             for k in tables:
-                line = (tables[k]['in_base']) + ['Cj']
-                liste = [[line[i]] + (tables[1]['Simplex array'].tolist())[i] for i in range(len(line))]
+                line = (list(tables[k]['in_base'])) + ['Cj']
 
-                D[k] = liste
-
+                liste = [[line[i]] + (np.array(tables[k]['Simplex array']).tolist())[i] for i in range(len(line))]
+                D.append(liste)
             return jsonify({
                 'success': True,
-                'allVariables': answer[3],
+                'allVariables': list(answer[3]),
                 'data': D,
-                'answer': answer[1]
+                'answer': dict(answer[1])
             })
+
         except Exception as e:
             # abort(500, f'{type(e)}: {e}')
             raise e
@@ -109,6 +109,7 @@ def create_app():
     @app.route('/')
     def hello_world():  # put application's code here
         return 'hello world'
+
     setup_error_template(app)
 
     CORS(app, resources={r"/*": {"origins": "*"}})
