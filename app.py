@@ -3,7 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 import yaml
 import numpy as np
-from computer.Simplex import simplex_case
+from utilities.algo_wrapper import simplex_case_py
 from numpy import array
 from error import setup_error_template
 import os
@@ -84,8 +84,7 @@ def create_app():
         try:
             print(request.get_json())
             A, B, C, inequality, tp = get_data(request)
-            simplex = simplex_case
-            answer = simplex(A, B, C)
+            answer = simplex_case_py(A, B, C,inequality)
             end = {'Simplex array': answer[0], 'in_base': answer[2]}
             tables = {k: answer[-1][k] for k in sorted(answer[-1].keys())}
             tables['end'] = end
@@ -104,7 +103,8 @@ def create_app():
                 'answer': answer[1]
             })
         except Exception as e:
-            abort(500, f'{type(e)}: {e}')
+            # abort(500, f'{type(e)}: {e}')
+            raise e
 
     @app.route('/')
     def hello_world():  # put application's code here
