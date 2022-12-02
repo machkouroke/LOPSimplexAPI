@@ -1,0 +1,67 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: lopsimplex
+  namespace: '937651835502'
+  selfLink: /apis/serving.knative.dev/v1/namespaces/937651835502/services/lopsimplex
+  uid: 2a9a07a3-9092-4816-b011-ae7ae44e9053
+  resourceVersion: AAXuzVL1Mk8
+  generation: 3
+  creationTimestamp: '2022-12-02T00:07:58.976379Z'
+  labels:
+    cloud.googleapis.com/location: europe-west1
+  annotations:
+    run.googleapis.com/client-name: gcloud
+    serving.knative.dev/creator: github@lopsimplex.iam.gserviceaccount.com
+    serving.knative.dev/lastModifier: github@lopsimplex.iam.gserviceaccount.com
+    client.knative.dev/user-image: gcr.io/lopsimplex/simplex
+    run.googleapis.com/client-version: 410.0.0
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+spec:
+  template:
+    metadata:
+      name: lopsimplex-00003-tiw
+      annotations:
+        run.googleapis.com/client-name: gcloud
+        client.knative.dev/user-image: gcr.io/lopsimplex/simplex
+        run.googleapis.com/client-version: 410.0.0
+        autoscaling.knative.dev/minScale: '2'
+        autoscaling.knative.dev/maxScale: '3'
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: 937651835502-compute@developer.gserviceaccount.com
+      containers:
+      - image: gcr.io/lopsimplex/simplex
+        ports:
+        - name: http1
+          containerPort: 8888
+        resources:
+          limits:
+            cpu: 4000m
+            memory: 16Gi
+  traffic:
+  - percent: 100
+    latestRevision: true
+status:
+  observedGeneration: 3
+  conditions:
+  - type: Ready
+    status: 'True'
+    lastTransitionTime: '2022-12-02T00:21:50.938100Z'
+  - type: ConfigurationsReady
+    status: 'True'
+    lastTransitionTime: '2022-12-02T00:21:47.109928Z'
+  - type: RoutesReady
+    status: 'True'
+    lastTransitionTime: '2022-12-02T00:21:51.060559Z'
+  latestReadyRevisionName: lopsimplex-00003-tiw
+  latestCreatedRevisionName: lopsimplex-00003-tiw
+  traffic:
+  - revisionName: lopsimplex-00003-tiw
+    percent: 100
+    latestRevision: true
+  url: https://lopsimplex-qzx7yzjfkq-uc.a.run.app
+  address:
+    url: https://lopsimplex-qzx7yzjfkq-uc.a.run.app
