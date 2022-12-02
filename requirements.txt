@@ -8,4 +8,6 @@ MarkupSafe==2.1.1
 PyYAML==6.0
 Werkzeug==2.2.2
 numpy~=1.23.5
-julia~=0.6.0
+juliacall==0.9.9
+juliapkg==0.1.9
+Flask-Cors==3.0.10
