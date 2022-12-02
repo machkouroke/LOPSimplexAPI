@@ -5,3 +5,5 @@ computer/Manifest.toml
 __pycache__
 .gitpod.yml
 computer/__pycache__
+scratch.py
+test.py

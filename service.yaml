@@ -5,8 +5,8 @@ metadata:
   namespace: '937651835502'
   selfLink: /apis/serving.knative.dev/v1/namespaces/937651835502/services/simplex
   uid: 835568dc-48d6-4378-99d0-d3354247c70a
-  resourceVersion: AAXuyazibFE
-  generation: 4
+  resourceVersion: AAXuziORK28
+  generation: 8
   creationTimestamp: '2022-12-01T19:37:36.964825Z'
   labels:
     managed-by: gcp-cloud-build-deploy-cloud-run
@@ -16,17 +16,17 @@ metadata:
     run.googleapis.com/client-name: cloud-console
     serving.knative.dev/creator: machkouroke@gmail.com
     serving.knative.dev/lastModifier: machkouroke@gmail.com
-    client.knative.dev/user-image: >-
-      gcr.io/lopsimplex/simplex@sha256:28ee45dd24d38b1da55a2755405aa78c07cd2cd21cbb3531328fa3eaaf48c4f4
+    client.knative.dev/user-image: gcr.io/lopsimplex/simplex@sha256:564a59bffc671eb4c8c1039c0056717bf6356729f0a3497b1f30d6df2bbfcaf5
     run.googleapis.com/ingress: all
     run.googleapis.com/ingress-status: all
 spec:
   template:
     metadata:
-      name: simplex-00004-qur
       annotations:
         run.googleapis.com/client-name: cloud-console
-        autoscaling.knative.dev/maxScale: '14'
+        autoscaling.knative.dev/minScale: '2'
+        run.googleapis.com/execution-environment: gen1
+        autoscaling.knative.dev/maxScale: '3'
         run.googleapis.com/cpu-throttling: 'false'
         run.googleapis.com/startup-cpu-boost: 'true'
     spec:
@@ -34,15 +34,29 @@ spec:
       timeoutSeconds: 300
       serviceAccountName: 937651835502-compute@developer.gserviceaccount.com
       containers:
-      - image: >-
-          gcr.io/lopsimplex/simplex@sha256:28ee45dd24d38b1da55a2755405aa78c07cd2cd21cbb3531328fa3eaaf48c4f4
+      - image: gcr.io/lopsimplex/simplex:latest
         ports:
         - name: http1
           containerPort: 8888
         resources:
           limits:
-            cpu: 2000m
-            memory: 4Gi
+            cpu: 4000m
+            memory: 16Gi
   traffic:
   - percent: 100
     latestRevision: true
+status:
+  observedGeneration: 8
+  conditions:
+  - type: Ready
+    status: 'True'
+    lastTransitionTime: '2022-12-02T01:20:10.943343Z'
+  - type: ConfigurationsReady
+    status: 'True'
+    lastTransitionTime: '2022-12-02T01:20:03.620085Z'
+  - type: RoutesReady
+    status: 'True'
+    lastTransitionTime: '2022-12-02T01:20:10.943343Z'
+  url: https://simplex-qzx7yzjfkq-ew.a.run.app
+  address:
+    url: https://simplex-qzx7yzjfkq-ew.a.run.app
