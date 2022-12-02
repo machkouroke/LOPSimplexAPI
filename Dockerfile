@@ -15,10 +15,7 @@ RUN pip install -r requirements.txt
 # Copy the content of the local src directory to the working directory
 COPY . .
 
-
-EXPOSE 8080
 # Specify the command to run on container start
 RUN python3 ./computer/init.py
 
-EXPOSE $PORT
-CMD ["gunicorn"  , "-b", "0.0.0.0:$PORT", "wsgi:app"]
+CMD gunicorn -b 0.0.0.0:$PORT wsgi:app
