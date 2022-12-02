@@ -18,4 +18,4 @@ COPY . .
 # Specify the command to run on container start
 RUN python3 ./computer/init.py
 
-CMD gunicorn -b 0.0.0.0:$PORT wsgi:app
+CMD gunicorn -b "0.0.0.0:$PORT" wsgi:app
