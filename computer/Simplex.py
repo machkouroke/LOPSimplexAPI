@@ -1,2 +1,2 @@
-from computer.init import jl
-simplex_case = jl.seval("LOPSimplex.simplex_case")
+from computer.init import main_jl
+simplex_case = main_jl.seval("LOPSimplex.simplex_case")
