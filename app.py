@@ -13,21 +13,39 @@ def create_app():
     app = Flask(__name__)
 
     def get_constraints(data):
-        return np.array([[float(y) for y in x.strip().split()] for x in data['constraints'].split('\n') if x])
+        return [x for x in data['constraints'].split('\n') if x]
+
+    def is_num(l):
+        try:
+            float(l)
+            return True
+        except Exception:
+            return False
+
+    def sparse(line, n):
+        if '{' in str(line) and '}' in str(line):
+            Z = line.replace('{', '').replace('}', '')
+            T = [l.split('->') for l in Z.split(';')]
+            C = [float(t) for t in T[0]] * n if len(T[0]) == 1 else [0 for i in range(n)]
+
+            for t in T:
+                if len(t) != 1:
+                    for pos in t[-1].split(','):
+                        C[int(pos) - 1] = float(t[0])
+        else:
+            C = [float(line)] * n if is_num(line) else [float(x) for x in line.split()]
+        return C
 
     def get_A(data):
         eq = get_constraints(data)
-        return eq[:, :-1]
+        return np.array([sparse(l, data['n']) for l in [x.split('=')[0] for x in eq]])
 
     def get_B(data):
         eq = get_constraints(data)
-        return eq[:, -1]
+        return np.array([int(x.split('=')[-1]) for x in eq])
 
     def get_C(data):
-        C = [float(x) for x in data['function'].split() if x]
-        if len(C) == data['n']:
-            C.append(0)
-        return np.array(C)
+        return np.array(sparse(data['function'], data['n']) + [0])
 
     def get_inequality(data):
         inequality = ['<=' for _ in range(data['p'])]
@@ -97,7 +115,7 @@ def create_app():
                 D.append(liste)
             return jsonify({
                 'success': True,
-                'allVariables': list(answer[3]),
+                'allVariables': list(answer[3])+['B'],
                 'data': D,
                 'answer': dict(answer[1])
             })

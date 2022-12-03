@@ -11,7 +11,6 @@ def get_constraints(data):
 
 def get_A(data):
     eq = get_constraints(data)
-
     return np.array([sparse(l, data['n']) for l in [x.split('=')[0] for x in eq]])
 
 
@@ -21,35 +20,44 @@ def get_B(data):
 
 
 def get_C(data):
-    C = [float(x) for x in data['function'].split() if x]
-    if len(C) == data['n']:
-        C.append(0)
-    return np.array(C)
+    return np.array(sparse(data['function'], data['n']) + [0])
 
 
 def get_inequality(data):
-    inequality = ['<=' for i in range(data['p'])]
-    others = ['=', '>=']
+    T = [l.split('->') for l in (data['inequality'].replace('{', '').replace('}', '')).split(';')]
+    inequality = T[0] * data['p'] if len(T[0]) == 1 else ['<=' for i in range(data['p'])]
+    others = ['=', '>=', '<=']
 
-    for t in [l.split('->') for l in data['inequality'].replace('{', '').replace('}', '').split(';')]:
-        for a in others:
-            if a in t:
-                for pos in t[-1].split(','):
-                    inequality[int(pos) - 1] = a
+    for t in T:
+        if len(t) != 1:
+            for a in others:
+                if a in t:
+                    for pos in t[-1].split(','):
+                        inequality[int(pos) - 1] = a
     return inequality
 
 
+def is_num(l):
+    try:
+        float(l)
+        return True
+    except Exception:
+        return False
+
+
 def sparse(line, n):
-    if '{' in line and '}' in line:
+    if '{' in str(line) and '}' in str(line):
         Z = line.replace('{', '').replace('}', '')
-        C = [0 for i in range(n)]
         T = [l.split('->') for l in Z.split(';')]
+        C = [float(t) for t in T[0]] * n if len(T[0]) == 1 else [0 for i in range(n)]
+
         for t in T:
-            for pos in t[-1].split(','):
-                C[int(pos) - 1] = int(t[0])
+            if len(t) != 1:
+                for pos in t[-1].split(','):
+                    C[int(pos) - 1] = float(t[0])
     else:
-        C = [int(x) for x in line.split()]
-    return np.array(C)
+        C = [float(line)] * n if is_num(line) else [float(x) for x in line.split()]
+    return C
 
 
 def get_type(type_user, inequality):
@@ -74,8 +82,7 @@ def get_data():
     with open("test/test.yaml", "r") as stream:
         data = yaml.safe_load(stream)
 
-    C = get_C(data) if data['mode'] == 'full' else sparse(data['function'], data['n'])
-    return get_A(data), get_B(data), C, get_inequality(data), data['type']
+    return get_A(data), get_B(data), get_C(data), get_inequality(data), data['type']
 
 
 if __name__ == '__main__':
