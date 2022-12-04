@@ -1,4 +1,6 @@
 import itertools
+import re
+
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 import yaml
@@ -13,7 +15,7 @@ def create_app():
     app = Flask(__name__)
 
     def get_constraints(data):
-        return [x for x in data['constraints'].split('\n') if x]
+        return [re.split(r"=|<=|>=", x) for x in data['constraints'].strip().split('\n')]
 
     def is_num(l):
         try:
@@ -38,24 +40,18 @@ def create_app():
 
     def get_A(data):
         eq = get_constraints(data)
-        return np.array([sparse(l, data['n']) for l in [x.split('=')[0] for x in eq]])
+        return np.array([sparse(l, data['n']) for l in [x[0] for x in eq]])
 
     def get_B(data):
         eq = get_constraints(data)
-        return np.array([int(x.split('=')[-1]) for x in eq])
+        return np.array([int(x[-1]) for x in eq])
 
     def get_C(data):
         return np.array(sparse(data['function'], data['n']) + [0])
 
     def get_inequality(data):
-        inequality = ['<=' for _ in range(data['p'])]
-        others = ['=', '>=']
-        for t, a in itertools.product(
-                [l.split('->') for l in data['inequality'].replace('{', '').replace('}', '').split(',')], others):
-            if a in t:
-                for pos in t[-1].split():
-                    inequality[int(pos) - 1] = a
-        return inequality
+        T = [re.split(r'\d|->|{|}|;', x) for x in data['constraints'].strip().split('\n')]
+        return [''.join(t).strip() for t in T]
 
     def validate_nb(n):
         return str(n).isdigit()
@@ -91,7 +87,10 @@ def create_app():
     def get_data(request):
         print(request.get_json())
         data = request.get_json()['script']
-        data = yaml.safe_load(data)
+        print(data)
+        # data = yaml.safe_load(data)
+        # print(data)
+        # data = yaml.safe_load(data)
         A = get_A(data)
         if val_cons_nb(A, data['p']) and val_var_nb(A, data['n']):
             return A, get_B(data), get_C(data), get_inequality(data), data['type']
@@ -115,7 +114,7 @@ def create_app():
                 D.append(liste)
             return jsonify({
                 'success': True,
-                'allVariables': list(answer[3])+['B'],
+                'allVariables': list(answer[3]) + ['B'],
                 'data': D,
                 'answer': dict(answer[1])
             })
@@ -124,9 +123,20 @@ def create_app():
             # abort(500, f'{type(e)}: {e}')
             raise e
 
+    @app.route('/data', methods=['POST'])
+    def data():
+        A, B, C, inequality, tp = get_data(request)
+        return jsonify({
+            'success': True,
+            'C': C.tolist(),
+            'A': A.tolist(),
+            'I': inequality
+        })
+
     @app.route('/')
     def hello_world():  # put application's code here
         return 'Simplex API v2.0'
+
     setup_error_template(app)
 
     CORS(app, resources={r"/*": {"origins": "*"}})
