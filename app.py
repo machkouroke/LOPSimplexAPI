@@ -1,111 +1,45 @@
-import itertools
-import re
-
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
-import yaml
 import numpy as np
-from utilities.algo_wrapper import simplex_case_py
-from numpy import array
-from error import setup_error_template
+from src.Error.error import setup_error_template
 import os
+
+from src.Exception.ValidationException import ValidationException
+from src.utilities.algo_wrapper import simplex_case_py
+from src.Validator.Validator import Validator
+from src.utilities.Extractor.Extractor import Extractor
+from src.utilities.utilities import get_type
 
 
 def create_app():
     app = Flask(__name__)
 
-    def get_constraints(data):
-        return [re.split(r"=|<=|>=", x) for x in data['constraints'].strip().split('\n')]
+    def get_data(req) -> tuple[np.array, np.array, np.array, list, str]:
+        """
+        Recuperer les parametres de la fonctions de Simplex
+        :param req: La requete
+        :return:
+        """
+        data = req.get_json()['script']
+        Validator.run(data)
+        return Extractor.get_A(data), \
+               Extractor.get_B(data), \
+               Extractor.get_C(data), \
+               Extractor.get_inequality(data), \
+               data['type']
 
-    def is_num(l):
+    @app.route('/solve', methods=['POST'])
+    def solver():
         try:
-            float(l)
-            return True
-        except Exception:
-            return False
 
-    def sparse(line, n):
-        if '{' in str(line) and '}' in str(line):
-            Z = line.replace('{', '').replace('}', '')
-            T = [l.split('->') for l in Z.split(';')]
-            C = [float(t) for t in T[0]] * n if len(T[0]) == 1 else [0 for i in range(n)]
+            A, B, C, inequality, type_user = get_data(request)
+            type_simplex = get_type(type_user, inequality)
+            answer = simplex_case_py(A, B, C, inequality, type_simplex)
 
-            for t in T:
-                if len(t) != 1:
-                    for pos in t[-1].split(','):
-                        C[int(pos) - 1] = float(t[0])
-        else:
-            C = [float(line)] * n if is_num(line) else [float(x) for x in line.split()]
-        return C
-
-    def get_A(data):
-        eq = get_constraints(data)
-        return np.array([sparse(l, data['n']) for l in [x[0] for x in eq]])
-
-    def get_B(data):
-        eq = get_constraints(data)
-        return np.array([int(x[-1]) for x in eq])
-
-    def get_C(data):
-        return np.array(sparse(data['function'], data['n']) + [0])
-
-    def get_inequality(data):
-        T = [re.split(r'\d|->|{|}|;', x) for x in data['constraints'].strip().split('\n')]
-        return [''.join(t).strip() for t in T]
-
-    def validate_nb(n):
-        return str(n).isdigit()
-
-    # def validate_cons(cons):
-    #     return all(x for x in cons)
-
-    def val_cons_nb(A: array, p):
-        return A.shape[0] == p
-
-    def val_var_nb(A: array, n):
-        return A.shape[1] == n
-
-    def validation_data(data):
-        pass
-
-    def get_type(type_user, inequality):
-        if type_user == 'max':
-            if all(x == '<=' for x in inequality):
-                tp = 'max_base'
-            elif all(x == '>=' for x in inequality):
-                tp = 'min_max'
-            else:
-                tp = 'max_mixed'
-        elif all(x == '>=' for x in inequality):
-            tp = 'min_base'
-        elif all(x == '<=' for x in inequality):
-            tp = 'min_max'
-        else:
-            tp = 'min_mixed'
-        return tp
-
-    def get_data(request):
-        print(request.get_json())
-        data = request.get_json()['script']
-        print(data)
-        # data = yaml.safe_load(data)
-        # print(data)
-        # data = yaml.safe_load(data)
-        A = get_A(data)
-        if val_cons_nb(A, data['p']) and val_var_nb(A, data['n']):
-            return A, get_B(data), get_C(data), get_inequality(data), data['type']
-
-    @app.route('/test', methods=['POST'])
-    def get_solution():
-        try:
-            A, B, C, inequality, tp = get_data(request)
-
-            answer = simplex_case_py(A, B, C, inequality)
-
-            end = {'Simplex array': np.array(answer[0]), 'in_base': list(answer[2])}
+            final_tab = {'Simplex array': np.array(answer[0]), 'in_base': list(answer[2])}
 
             tables = {k: dict(answer[-1][k]) for k in sorted(dict(answer[-1]).keys())}
-            tables['end'] = end
+            tables['end'] = final_tab
             D = []
             for k in tables:
                 line = (list(tables[k]['in_base'])) + ['Cj']
@@ -118,20 +52,11 @@ def create_app():
                 'data': D,
                 'answer': dict(answer[1])
             })
-
+        except ValidationException as e:
+            abort(400, f'{e}')
         except Exception as e:
             # abort(500, f'{type(e)}: {e}')
             raise e
-
-    @app.route('/data', methods=['POST'])
-    def data():
-        A, B, C, inequality, tp = get_data(request)
-        return jsonify({
-            'success': True,
-            'C': C.tolist(),
-            'A': A.tolist(),
-            'I': inequality
-        })
 
     @app.route('/')
     def hello_world():  # put application's code here
