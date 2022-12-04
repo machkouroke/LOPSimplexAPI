@@ -1,9 +1,9 @@
 venv
 .idea
-computer/Manifest.toml
+src/computer/Manifest.toml
 .vscode 
 __pycache__
 .gitpod.yml
-computer/__pycache__
+src/computer/__pycache__
 scratch.py
 test.py

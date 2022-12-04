@@ -1,22 +1,23 @@
 import yaml
 import numpy as np
+import re
 # import pandas as pd
 
 from julia import LOPSimplex, Main
 
 
 def get_constraints(data):
-    return [x for x in data['constraints'].split('\n') if x]
+    return [re.split(r"=|<=|>=", x) for x in data['constraints'].strip().split('\n')]
 
 
 def get_A(data):
     eq = get_constraints(data)
-    return np.array([sparse(l, data['n']) for l in [x.split('=')[0] for x in eq]])
+    return np.array([sparse(l, data['n']) for l in [x[0] for x in eq]])
 
 
 def get_B(data):
     eq = get_constraints(data)
-    return np.array([int(x.split('=')[-1]) for x in eq])
+    return np.array([int(x[-1]) for x in eq])
 
 
 def get_C(data):
@@ -24,16 +25,9 @@ def get_C(data):
 
 
 def get_inequality(data):
-    T = [l.split('->') for l in (data['inequality'].replace('{', '').replace('}', '')).split(';')]
-    inequality = T[0] * data['p'] if len(T[0]) == 1 else ['<=' for i in range(data['p'])]
-    others = ['=', '>=', '<=']
+    T = [re.split(r'\d|->|{|}|;',x) for x in data['constraints'].strip().split('\n')]
+    inequality = [''.join(t).strip() for t in T]
 
-    for t in T:
-        if len(t) != 1:
-            for a in others:
-                if a in t:
-                    for pos in t[-1].split(','):
-                        inequality[int(pos) - 1] = a
     return inequality
 
 
@@ -81,6 +75,7 @@ def get_type(type_user, inequality):
 def get_data():
     with open("test/test.yaml", "r") as stream:
         data = yaml.safe_load(stream)
+    print(data)
 
     return get_A(data), get_B(data), get_C(data), get_inequality(data), data['type']
 
