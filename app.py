@@ -1,3 +1,4 @@
+import yaml
 from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 import numpy as np
@@ -20,7 +21,9 @@ def create_app():
         :param req: La requete
         :return:
         """
-        data = req.get_json()['script']
+        data: str = req.get_json()['script']
+        print(data)
+        data: dict = yaml.safe_load(data)
         Validator.run(data)
         return Extractor.get_A(data), \
                Extractor.get_B(data), \
@@ -48,7 +51,7 @@ def create_app():
                 D.append(liste)
             return jsonify({
                 'success': True,
-                'allVariables': list(answer[3])+['B'],
+                'allVariables': list(answer[3]) + ['B'],
                 'data': D,
                 'answer': dict(answer[1])
             })
@@ -61,6 +64,7 @@ def create_app():
     @app.route('/')
     def hello_world():  # put application's code here
         return 'Simplex API v3.0'
+
     setup_error_template(app)
 
     CORS(app, resources={r"/*": {"origins": "*"}})
