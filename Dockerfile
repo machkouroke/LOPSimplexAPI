@@ -16,6 +16,6 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Specify the command to run on container start
-RUN python3 ./computer/init.py
+RUN python3 ./src/computer/init.py
 
 CMD gunicorn -b "0.0.0.0:8888" wsgi:app
