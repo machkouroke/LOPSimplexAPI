@@ -8,8 +8,8 @@ from app import create_app
 class BaseTestView(unittest.TestCase):
 
     def init(self):
-        with open( "tests//views/test.yaml", "r") as stream:
-            self.data = yaml.safe_load(stream)
+        with open( "test.yaml", "r") as stream:
+            self.data = stream.read()
 
         # print(self.data)
         self.app = create_app()

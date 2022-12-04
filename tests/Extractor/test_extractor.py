@@ -1,4 +1,4 @@
-from test.base import BaseTest
+from tests.base import BaseTest
 from src.utilities.Extractor.Extractor import *
 
 
