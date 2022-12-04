@@ -1,5 +1,4 @@
-from base import BaseTestView
-from src.Validator.Validator import Validator
+from tests.views.base import BaseTestView
 
 
 class TestSolver(BaseTestView):
@@ -12,4 +11,5 @@ class TestSolver(BaseTestView):
         print(d)
         # self.assertEqual(d['success'],True)
 
-
+if __name__ == "__main__":
+    unittest.main()
