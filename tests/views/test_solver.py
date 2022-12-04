@@ -1,4 +1,4 @@
-from test.views.base import BaseTestView
+from tests.views.base import BaseTestView
 
 
 class TestSolver(BaseTestView):
@@ -9,3 +9,6 @@ class TestSolver(BaseTestView):
         d = res.get_json()
         print(d)
         # self.assertEqual(d['success'],True)
+
+if __name__ == "__main__":
+    unittest.main()
