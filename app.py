@@ -126,7 +126,7 @@ def create_app():
 
     @app.route('/')
     def hello_world():  # put application's code here
-        return 'Simplex API v2.0'
+        return 'Simplex API v3.0'
     setup_error_template(app)
 
     CORS(app, resources={r"/*": {"origins": "*"}})
