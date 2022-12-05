@@ -62,8 +62,8 @@ def create_app():
             raise e
 
     @app.route('/')
-    def hello_world():  # put application's code here
-        return 'Simplex API v3.0'
+    def hello_world(): 
+        return 'Simplex API v4.0'
 
     setup_error_template(app)
 
