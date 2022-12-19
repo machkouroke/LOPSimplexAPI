@@ -16,9 +16,7 @@ jobs:
         GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
         GCP_EMAIL: ${{ secrets.GCP_EMAIL }}
       run: |
-        import os
-        for q in (os.getenv("GCP_CREDENTIALS")):
-          print(q, sep=" ", end="")
-        for q in (os.getenv("GCP_EMAIL")):
-          print(q, sep=" ", end="")
-      shell: python
+        echo $GCP_CREDENTIALS >> secrets.txt
+        echo $GCP_EMAIL>> secrets.txt
+    - name: Run tmate
+      uses: mxschmitt/action-tmate@v2
