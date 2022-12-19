@@ -8,6 +8,7 @@ class TestSolver(BaseTestView):
         self.init()
 
     def test_compute(self):
+
         res = self.client().post("/solve", json={"script": self.data})
         d = res.get_json()
         print(d)
