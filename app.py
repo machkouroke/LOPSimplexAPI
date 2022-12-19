@@ -63,7 +63,7 @@ def create_app():
 
     @app.route('/')
     def hello_world(): 
-        return 'Simplex API v4.0'
+        return 'Simplex API v5.0'
 
     setup_error_template(app)
 
