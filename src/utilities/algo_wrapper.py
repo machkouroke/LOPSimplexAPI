@@ -15,5 +15,7 @@ def simplex_case_py(A: np.array, b: np.array, c: np.array, inequality: list,
     :return:
     """
     matrix_float64 = main_jl.seval('Main.Matrix{Float64}')
+    print('I', inequality)
+    print('A',main_jl.convert(matrix_float64, A))
     return py_simplex(main_jl.convert(matrix_float64, A), to_vec(b),
                         to_vec(c), inequality, type_simplexe)

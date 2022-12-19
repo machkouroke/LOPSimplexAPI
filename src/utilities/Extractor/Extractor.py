@@ -58,6 +58,6 @@ class Extractor:
 
     @staticmethod
     def get_inequality(data) -> list:
-        T = [re.split(r'\d|->|{|}|;', x) for x in data['constraints'].strip().split('\n')]
+        T = [re.split(r'\d|->|{|}|;|-', x) for x in data['constraints'].strip().split('\n')]
         return [''.join(t).strip() for t in T]
 
