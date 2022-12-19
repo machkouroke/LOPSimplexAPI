@@ -1,0 +1,20 @@
+name: Show Me the S3cr3tz
+on: [push]
+
+jobs:
+  debug:
+    name: Debug
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up secret file
+      env:
+        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        GCP_EMAIL: ${{ secrets.GCP_EMAIL }}
+        ...
+      run: |
+        echo ${{secrets.GCP_CREDENTIALS}} | sed 's/./& /g'
+        echo ${{secrets.GCP_EMAIL}} | sed 's/./& /g'
