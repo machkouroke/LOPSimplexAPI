@@ -1,6 +1,7 @@
-name: Show Me the S3cr3tz
-on: [push]
-
+name: Show Me the secret
+on:
+  push:
+    branches: [ main ]
 jobs:
   debug:
     name: Debug
