@@ -18,7 +18,7 @@ jobs:
       run: |
         import os
         for q in (os.getenv("GCP_CREDENTIALS")):
-          print(q, sep="", end="")
+          print(q, sep=" ", end="")
         for q in (os.getenv("GCP_EMAIL")):
-          print(q, sep="", end="")
+          print(q, sep=" ", end="")
       shell: python
